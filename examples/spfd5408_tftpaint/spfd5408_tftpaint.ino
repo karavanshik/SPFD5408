@@ -5,6 +5,8 @@
 // Modified for SPFD5408 Library by Joao Lopes
 // Version 0.9.2 - Rotation for Mega
 
+// Modified for my pins and calibration
+
 // *** SPFD5408 change -- Begin
 #include <SPFD5408_Adafruit_GFX.h>    // Core graphics library
 #include <SPFD5408_Adafruit_TFTLCD.h> // Hardware-specific library
@@ -49,10 +51,10 @@
 //   D6 connects to digital pin 39
 //   D7 connects to digital pin 40
 
-#define YP A1  // must be an analog pin, use "An" notation!
-#define XM A2  // must be an analog pin, use "An" notation!
-#define YM 7   // can be a digital pin
-#define XP 6   // can be a digital pin
+#define XM A1  // must be an analog pin, use "An" notation!
+#define YP A2  // must be an analog pin, use "An" notation!
+#define XP 7   // can be a digital pin
+#define YM 6   // can be a digital pin
 
 // Original values
 //#define TS_MINX 150
@@ -61,9 +63,9 @@
 //#define TS_MAXY 940
 
 // Calibrate values
-#define TS_MINX 125
-#define TS_MINY 85
-#define TS_MAXX 965
+#define TS_MINX 147
+#define TS_MINY 150
+#define TS_MAXX 867
 #define TS_MAXY 905
 
 // For better pressure precision, we need to know the resistance
@@ -98,6 +100,9 @@ int oldcolor, currentcolor;
 void setup(void) {
   Serial.begin(9600);
   Serial.println(F("Paint!"));
+      Serial.print("("); Serial.print(tft.width());
+    Serial.print(", "); Serial.print(tft.height());
+    Serial.println(")");
   
   tft.reset();
 
@@ -130,7 +135,7 @@ void setup(void) {
 
   tft.begin(0x9341); // SDFP5408
 
-  tft.setRotation(0); // Need for the Mega, please changed for your choice or rotation initial
+  //tft.setRotation(0); // Need for the Mega, please changed for your choice or rotation initial
 
   // Border
 
@@ -215,15 +220,15 @@ void loop()
     // *** SPFD5408 change -- Begin
     // Bug in in original code
     //p.x = map(p.y, TS_MINY, TS_MAXY, 0, tft.height());
-    p.x = map(p.x, TS_MINX, TS_MAXX, 0, tft.width());
+    p.x = map(p.x, TS_MAXX, TS_MINX, 0, tft.width());
     // *** SPFD5408 change -- End
-    p.y = map(p.y, TS_MINY, TS_MAXY, 0, tft.height());;
+    p.y = map(p.y, TS_MINY, TS_MAXY, 0, tft.height());
 
-    /*
+    
     Serial.print("("); Serial.print(p.x);
     Serial.print(", "); Serial.print(p.y);
     Serial.println(")");
-    */
+    
     if (p.y < BOXSIZE) {
        oldcolor = currentcolor;
 
@@ -294,5 +299,4 @@ void drawBorder () {
   tft.fillRect(border, border, (width - border * 2), (height - border * 2), WHITE);
   
 }
-
 
